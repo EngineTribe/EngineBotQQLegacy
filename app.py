@@ -12,13 +12,17 @@ webhook_app = Flask(__name__)
 
 
 @bot_app.route('/', methods=['POST'])
-def bot():
+async def bot():
     data = request.get_json()
     if not data['group_id'] in ENABLED_GROUPS:
         # bot only works in enabled groups
         return 'failed'
-    commands = {'e!help': command_help}
-    commands[data['message']](data)
+    commands = {
+        'e!help': command_help,
+        'e!register': command_register,
+        'e!permission': command_permission
+    }
+    await commands[data['message'].strip().split(' ')[0]](data)
     return 'success'
 
 

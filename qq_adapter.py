@@ -1,9 +1,8 @@
 from config import *
-from urllib.parse import quote
 import requests
 
 
-def send_msg(group_id: str, message: str):
+def send_group_msg(group_id: str, message: str):
     return cqhttp_api('send_msg', {'message_type': 'group', 'group_id': group_id, 'message': message})
 
 
