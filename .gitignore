@@ -1,0 +1,7 @@
+__pycache__/
+config.yml
+go-cqhttp
+data/
+logs/
+session.token
+device.json

@@ -1,0 +1,11 @@
+{
+	".or": [{
+			"message": {
+				".regex": "^e!"
+			}
+		}
+	],
+	"anonymous": {
+		".eq": null
+	}
+}
