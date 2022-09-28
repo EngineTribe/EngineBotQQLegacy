@@ -26,6 +26,11 @@ async def bot():
     return 'success'
 
 
+@webhook_app.route('/payload', methods=['POST'])
+async def webhook_payload():
+    return 'qwq'
+
+
 def run_bot():
     bot_app.run(host=HOST, port=BOT_PORT, debug=DEBUG_MODE)
 
