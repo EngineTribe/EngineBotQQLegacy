@@ -2,6 +2,7 @@
 
 from flask import Flask, request, jsonify
 from config import *
+import json
 import threading
 from time import sleep
 from engine_bot import *
@@ -28,7 +29,7 @@ async def bot():
 
 @webhook_app.route('/payload', methods=['POST'])
 async def webhook_payload():
-    webhook = request.get_json()
+    webhook = json.loads(request.get_data())
     if 'head_commit' in webhook:  # push
         for group in ENABLED_GROUPS:
             message = '📤 ' + webhook['repository']['name'] + ' 仓库中有了新提交:\n'
