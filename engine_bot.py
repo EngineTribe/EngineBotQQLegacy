@@ -16,6 +16,10 @@ e!report : 举报关卡。'''
         retval += '''
 📑 可用的管理命令:
 e!permission : 更新用户权限。'''
+    if data['sender']['user_id'] in GAME_ADMIN:
+        retval += '''
+        📑 可用的游戏管理命令:
+        e!ban : 封禁用户。'''
     send_group_msg(group_id=data['group_id'], message=retval)
     return
 
@@ -41,6 +45,31 @@ async def command_register(data):
 
         except Exception as e:
             send_group_msg(data['group_id'], '❌ 无效的注册码。\n' + str(e))
+            return
+
+
+async def command_ban(data):
+    if not data['sender']['user_id'] in GAME_ADMIN:
+        send_group_msg(data['group_id'], '❌ 无权使用该命令。')
+        return
+    if data['message'].strip() == 'e!ban':
+        send_group_msg(data['group_id'],
+                       '使用方法: e!ban 用户名')
+        return
+    else:
+        try:
+            username = data['message'].split(' ')[1]
+            response_json = requests.post(url=ENGINE_TRIBE_HOST + '/user/update_permission',
+                                          json={'username': username, 'permission': 'banned',
+                                                'value': True, 'api_key': ENGINE_TRIBE_API_KEY}).json()
+            if 'success' in response_json:
+                send_group_msg(data['group_id'],
+                               '✅ 成功封禁 ' + username + '。')
+            else:
+                send_group_msg(data['group_id'], '❌ 权限更新失败。\n' + str(response_json))
+                return
+        except Exception as e:
+            send_group_msg(data['group_id'], '❌ 命令出现错误。\n' + str(e))
             return
 
 

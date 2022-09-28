@@ -8,4 +8,5 @@ ENGINE_TRIBE_HOST = 'http://127.0.0.1:25019'  # Engine Tribe host
 ENGINE_TRIBE_API_KEY = 'enginetribe'  # Engine Tribe API Key for Engine-bot
 ENABLED_GROUPS = [723483890]
 BOT_ADMIN = [3526514925]
+GAME_ADMIN = [3526514925]
 BOT_AUTH_CODE = 'EngineBot|PC|CN'  # fake SMM_WE client token
