@@ -3,17 +3,19 @@ import base64
 
 from qq_adapter import *
 
+styles = ['超马1', '超马3', '超马世界', '新超马U']
+
 
 async def command_help(data):
-    retval = '''📑 可用的命令:
+    retval = '''📑 可用的命令 (输入命令以查看用法):
 e!help : 查看此帮助。
 e!register : 注册帐号。
-'''
+e!search : 搜索关卡。
+e!report : 举报关卡。'''
     if data['sender']['user_id'] in BOT_ADMIN:
         retval += '''
 📑 可用的管理命令:
-e!permission : 更新用户权限。        
-'''
+e!permission : 更新用户权限。'''
     send_group_msg(group_id=data['group_id'], message=retval)
     return
 
@@ -63,10 +65,63 @@ async def command_permission(data):
                                           json={'username': username, 'permission': permission,
                                                 'value': value, 'api_key': ENGINE_TRIBE_API_KEY}).json()
             if 'success' in response_json:
-                send_group_msg(data['group_id'], '✅ 成功将 '+username+' 的 '+permission+' 权限更新为 '+str(value)+'。')
+                send_group_msg(data['group_id'],
+                               '✅ 成功将 ' + username + ' 的 ' + permission + ' 权限更新为 ' + str(value) + '。')
             else:
                 send_group_msg(data['group_id'], '❌ 权限更新失败。\n' + str(response_json))
                 return
         except Exception as e:
             send_group_msg(data['group_id'], '❌ 命令出现错误。\n' + str(e))
             return
+
+
+async def command_report(data):
+    if data['message'].strip() == 'e!report':
+        send_group_msg(data['group_id'], '''❌ 使用方法: e!report 关卡ID''')
+        return
+    else:
+        level_id = data['message'].split(' ')[1]
+        for admin in BOT_ADMIN:
+            message = '⚠ 接到举报 ' + level_id
+            send_private_msg(user_id=admin, message=message)
+
+
+async def command_search(data):
+    if data['message'].strip() == 'e!search':
+        send_group_msg(data['group_id'], '''❌ 使用方法: e!search 关卡ID''')
+        return
+    else:
+        level_id = data['message'].split(' ')[1].upper()
+        if '-' not in level_id:
+            level_id = prettify_level_id(level_id)
+        if len(level_id) != 19:
+            send_group_msg(data['group_id'], '''❌ 无效的关卡 ID。''')
+            return
+        try:
+            response_json = requests.post(url=ENGINE_TRIBE_HOST + '/stage/' + level_id,
+                                          data='auth_code=' + BOT_AUTH_CODE).json()
+            if 'error_type' in response_json:
+                send_group_msg(data['group_id'], '''❌ 关卡未找到。''')
+                return
+            else:
+                level_data = response_json['result']
+                message = '查询关卡: ' + level_data['name'] + '\n'
+                message += '作者: ' + level_data['author']
+                if int(level_data['featured']) ==1:
+                    message += ' (管理推荐关卡)'
+                message += '\n'
+                message += '上传于 ' + level_data['date']
+                message += str(level_data['likes']) + '❤ ' + str(level_data['dislikes']) + '💙\n'
+                clears = level_data['victorias']
+                plays = level_data['intentos']
+                message += str(clears) + '次通关/' + str(plays) + '次游玩 ' + str(
+                    round((clears / plays) * 100, 2)) + '%\n'
+                message += '标签: ' + level_data['etiquetas'] + ', 游戏风格: ' + styles[int(level_data['apariencia'])]
+
+        except Exception as e:
+            send_group_msg(data['group_id'], '''❌ 命令出现错误，连接到引擎部落后端时出错。''' + str(e))
+            return
+
+
+def prettify_level_id(level_id: str):
+    return level_id[0:4] + '-' + level_id[4:8] + '-' + level_id[8:12] + '-' + level_id[12:16]

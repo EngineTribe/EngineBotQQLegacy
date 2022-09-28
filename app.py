@@ -21,7 +21,9 @@ async def bot():
     commands = {
         'e!help': command_help,
         'e!register': command_register,
-        'e!permission': command_permission
+        'e!permission': command_permission,
+        'e!report': command_report,
+        'e!search': command_search
     }
     await commands[data['message'].strip().split(' ')[0]](data)
     return 'success'
