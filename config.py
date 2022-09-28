@@ -1,5 +1,6 @@
-HOST = '127.0.0.1'
+BOT_HOST = '127.0.0.1'
 BOT_PORT = 5583
+WEBHOOK_HOST = 'enginetribe.gq'
 WEBHOOK_PORT = 5584
 DEBUG_MODE = False  # Do not use seperated threads
 GO_CQHTTP_HOST = 'http://127.0.0.1:5701'  # go-cqhttp host
