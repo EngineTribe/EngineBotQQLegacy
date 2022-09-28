@@ -28,15 +28,16 @@ async def bot():
 
 @webhook_app.route('/payload', methods=['POST'])
 async def webhook_payload():
+    print(request.json)
     return 'qwq'
 
 
 def run_bot():
-    bot_app.run(host=HOST, port=BOT_PORT, debug=DEBUG_MODE)
+    bot_app.run(host=BOT_HOST, port=BOT_PORT, debug=DEBUG_MODE)
 
 
 def run_webhook():
-    webhook_app.run(host=HOST, port=WEBHOOK_PORT, debug=DEBUG_MODE)
+    webhook_app.run(host=WEBHOOK_HOST, port=WEBHOOK_PORT, debug=DEBUG_MODE)
 
 
 if __name__ == '__main__':
