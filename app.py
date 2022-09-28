@@ -28,8 +28,13 @@ async def bot():
 
 @webhook_app.route('/payload', methods=['POST'])
 async def webhook_payload():
-    print(request.json)
-    return 'qwq'
+    webhook = request.json
+    if 'comment' in webhook:
+        for group in ENABLED_GROUPS:
+            message = '📤 ' + webhook['repository']['name'] + ' 仓库中有了新提交:\n'
+            message += webhook['comment']['body'] + '\n'
+            message += '(由 ' + webhook['comment']['user']['login'] + ' 提交)'
+            send_group_msg(group_id=group, message=message)
 
 
 def run_bot():
