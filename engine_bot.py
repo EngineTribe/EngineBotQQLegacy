@@ -18,8 +18,8 @@ e!report : 举报关卡。'''
 e!permission : 更新用户权限。'''
     if data['sender']['user_id'] in GAME_ADMIN:
         retval += '''
-        📑 可用的游戏管理命令:
-        e!ban : 封禁用户。'''
+📑 可用的游戏管理命令:
+e!ban : 封禁用户。'''
     send_group_msg(group_id=data['group_id'], message=retval)
     return
 
