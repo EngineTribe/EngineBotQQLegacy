@@ -35,6 +35,7 @@ async def webhook_payload():
             message += webhook['head_commit']['message'] + '\n'
             message += '(由 ' + webhook['head_commit']['committer']['name']['login'] + ' 提交)'
             send_group_msg(group_id=group, message=message)
+        return 'Success'
 
 
 def run_bot():
