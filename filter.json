@@ -1,11 +1,15 @@
 {
-	".or": [{
-			"message": {
-				".regex": "^e!"
-			}
-		}
-	],
-	"anonymous": {
-		".eq": null
-	}
+  ".or": [
+    {
+      "message": {
+        ".regex": "^e!",
+        "anonymous": {
+          ".eq": null
+        }
+      }
+    },
+    {
+      "post_type": "notice"
+    }
+  ]
 }

@@ -15,19 +15,37 @@ webhook_app = Flask(__name__)
 @bot_app.route('/', methods=['POST'])
 async def bot():
     data = request.get_json()
-    if not data['group_id'] in ENABLED_GROUPS:
-        # bot only works in enabled groups
-        return 'failed'
-    commands = {
-        'e!help': command_help,
-        'e!register': command_register,
-        'e!permission': command_permission,
-        'e!report': command_report,
-        'e!search': command_search,
-        'e!ban': command_ban
-    }
-    await commands[data['message'].strip().split(' ')[0]](data)
-    return 'success'
+    if data['post_type'] == 'notice':
+        if data['notice_type'] == 'group_decrease':
+            response_json = requests.post(url=ENGINE_TRIBE_HOST + '/user/update_permission',
+                                          json={'user_id': data['user_id'], 'permission': 'valid',
+                                                'value': False, 'api_key': ENGINE_TRIBE_API_KEY}).json()
+            if 'success' in response_json:
+                send_group_msg(data['group_id'],
+                               response_json['username'] + '已经退群，所以帐号暂时冻结。下次入群时将恢复可玩。')
+            else:
+                send_group_msg(data['group_id'], '❌ 冻结帐号失败，' + data['user_id'] + '并没有注册引擎部落账号。')
+                return
+            return 'Success'
+        if data['notice_type'] == 'group_increase':
+            requests.post(url=ENGINE_TRIBE_HOST + '/user/update_permission',
+                          json={'user_id': data['user_id'], 'permission': 'valid', 'value': True,
+                                'api_key': ENGINE_TRIBE_API_KEY}).json()
+            return 'Success'
+    else:
+        if not data['group_id'] in ENABLED_GROUPS:
+            # bot only works in enabled groups
+            return 'failed'
+        commands = {
+            'e!help': command_help,
+            'e!register': command_register,
+            'e!permission': command_permission,
+            'e!report': command_report,
+            'e!search': command_search,
+            'e!ban': command_ban
+        }
+        await commands[data['message'].strip().split(' ')[0]](data)
+        return 'Success'
 
 
 # GitHub webhook
