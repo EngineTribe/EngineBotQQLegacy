@@ -41,7 +41,16 @@ async def command_register(data):
             if 'success' in response_json:
                 send_group_msg(data['group_id'], response_json['success'])
             else:
-                send_group_msg(data['group_id'], '❌ 注册失败。\n' + response_json['message'])
+                if response_json['error_type'] == '035':
+                    send_group_msg(data['group_id'], '❌ 注册失败。\n' + '一个 QQ 号只能注册一个帐号，' + '\n' +
+                                   response_json['user_id'] + ' 不能再注册账号了。')
+                elif response_json['error_type'] == '036':
+                    send_group_msg(data['group_id'], '❌ 注册失败。\n' + response_json['username'] +
+                                   ' 用户名已经存在，请回到注册网页换一个用户名。')
+                else:
+                    send_group_msg(data['group_id'], '❌ 注册失败，发生未知错误。\n' + response_json['error_type'] + '\n' +
+                                   response_json['message'])
+
 
         except Exception as e:
             send_group_msg(data['group_id'], '❌ 无效的注册码。\n' + str(e))
@@ -136,7 +145,7 @@ async def command_search(data):
                 level_data = response_json['result']
                 message = '查询关卡: ' + level_data['name'] + '\n'
                 message += '作者: ' + level_data['author']
-                if int(level_data['featured']) ==1:
+                if int(level_data['featured']) == 1:
                     message += ' (管理推荐关卡)'
                 message += '\n'
                 message += '上传于 ' + level_data['date']

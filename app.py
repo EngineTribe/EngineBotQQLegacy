@@ -51,7 +51,6 @@ async def webhook_payload():
             return 'NotImplemented'
 
 
-
 def run_bot():
     bot_app.run(host=BOT_HOST, port=BOT_PORT, debug=DEBUG_MODE)
 
