@@ -30,6 +30,7 @@ async def bot():
     return 'success'
 
 
+# GitHub webhook
 @webhook_app.route('/payload', methods=['POST'])
 async def webhook_payload():
     webhook = request.get_json()
@@ -44,6 +45,16 @@ async def webhook_payload():
         if webhook['action'] == 'completed':
             message = '📤 ' + webhook['repository']['name'] + ' 仓库的网页部署完成:\n'
             message += webhook['workflow_run']['head_commit']['message']
+            for group in ENABLED_GROUPS:
+                send_group_msg(group_id=group, message=message)
+            return 'Success'
+        else:
+            return 'NotImplemented'
+    elif 'release' in webhook:
+        if webhook['action'] == 'published':
+            message = '⏩ [CQ:at,qq=all] 引擎部落服务器发布了新的大版本: ' + webhook['release']['tag_name'] + '!\n'
+            message += '更新日志如下:\n'
+            message += webhook['release']['body']
             for group in ENABLED_GROUPS:
                 send_group_msg(group_id=group, message=message)
             return 'Success'
