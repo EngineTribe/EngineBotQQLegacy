@@ -34,12 +34,22 @@ async def bot():
 async def webhook_payload():
     webhook = request.get_json()
     if 'head_commit' in webhook:  # push
+        message = '📤 ' + webhook['repository']['name'] + ' 仓库中有了新提交:\n'
+        message += webhook['head_commit']['message'] + '\n'
+        message += '(由 ' + webhook['head_commit']['committer']['name'] + ' 提交)'
         for group in ENABLED_GROUPS:
-            message = '📤 ' + webhook['repository']['name'] + ' 仓库中有了新提交:\n'
-            message += webhook['head_commit']['message'] + '\n'
-            message += '(由 ' + webhook['head_commit']['committer']['name'] + ' 提交)'
             send_group_msg(group_id=group, message=message)
         return 'Success'
+    elif 'workflow_run' in webhook:
+        if webhook['action'] == 'completed':
+            message = '📤 ' + webhook['repository']['name'] + ' 仓库的网页部署完成:\n'
+            message += webhook['workflow_run']['head_commit']['message']
+            for group in ENABLED_GROUPS:
+                send_group_msg(group_id=group, message=message)
+            return 'Success'
+        else:
+            return 'NotImplemented'
+
 
 
 def run_bot():
