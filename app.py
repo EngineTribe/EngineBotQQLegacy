@@ -22,9 +22,9 @@ async def bot():
                                                 'value': False, 'api_key': ENGINE_TRIBE_API_KEY}).json()
             if 'success' in response_json:
                 send_group_msg(data['group_id'],
-                               response_json['username'] + '已经退群，所以帐号暂时冻结。下次入群时将恢复可玩。')
+                               response_json['username'] + ' 已经退群，所以帐号暂时冻结。下次入群时将恢复可玩。')
             else:
-                send_group_msg(data['group_id'], '❌ 冻结帐号失败，' + data['user_id'] + '并没有注册引擎部落账号。')
+                send_group_msg(data['group_id'], '❌ 冻结帐号失败，' + str(data['user_id']) + '并没有注册引擎部落账号。')
                 return
             return 'Success'
         if data['notice_type'] == 'group_increase':
@@ -41,7 +41,7 @@ async def bot():
             'e!register': command_register,
             'e!permission': command_permission,
             'e!report': command_report,
-            'e!search': command_search,
+            'e!query': command_query,
             'e!ban': command_ban
         }
         await commands[data['message'].strip().split(' ')[0]](data)

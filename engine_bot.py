@@ -10,7 +10,7 @@ async def command_help(data):
     retval = '''📑 可用的命令 (输入命令以查看用法):
 e!help : 查看此帮助。
 e!register : 注册帐号。
-e!search : 搜索关卡。
+e!query : 查询关卡。
 e!report : 举报关卡。'''
     if data['sender']['user_id'] in BOT_ADMIN:
         retval += '''
@@ -39,7 +39,7 @@ async def command_register(data):
                                                 'user_id': data['sender']['user_id'],
                                                 'api_key': ENGINE_TRIBE_API_KEY}).json()
             if 'success' in response_json:
-                send_group_msg(data['group_id'], '🎉 注册成功，现在可以使用 ' + response_json['username'] + '在游戏中登录了。')
+                send_group_msg(data['group_id'], '🎉 注册成功，现在可以使用 ' + response_json['username'] + ' 在游戏中登录了。')
             else:
                 if response_json['error_type'] == '035':
                     send_group_msg(data['group_id'], '❌ 注册失败。\n' + '一个 QQ 号只能注册一个帐号，' + '\n' +
@@ -119,12 +119,12 @@ async def command_report(data):
         return
     else:
         level_id = data['message'].split(' ')[1]
-        for admin in BOT_ADMIN:
+        for admin in GAME_ADMIN:
             message = '⚠ 接到举报 ' + level_id
             send_private_msg(user_id=admin, message=message)
 
 
-async def command_search(data):
+async def command_query(data):
     if data['message'].strip() == 'e!search':
         send_group_msg(data['group_id'], '''❌ 使用方法: e!search 关卡ID''')
         return
@@ -153,7 +153,7 @@ async def command_search(data):
                 clears = level_data['victorias']
                 plays = level_data['intentos']
                 message += str(clears) + '次通关/' + str(plays) + '次游玩 ' + str(
-                    round((clears / plays) * 100, 2)) + '%\n'
+                    round((int(clears) / int(plays)) * 100, 2)) + '%\n'
                 message += '标签: ' + level_data['etiquetas'] + ', 游戏风格: ' + styles[int(level_data['apariencia'])]
 
         except Exception as e:
