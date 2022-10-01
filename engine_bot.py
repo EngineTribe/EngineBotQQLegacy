@@ -150,7 +150,7 @@ async def command_query(data):
                     message += ' (管理推荐关卡)'
                 message += '\n'
                 message += '上传于 ' + level_data['date']
-                message += str(level_data['likes']) + '❤ ' + str(level_data['dislikes']) + '💙\n'
+                message += '  ' + str(level_data['likes']) + '❤ ' + str(level_data['dislikes']) + '💙\n'
                 clears = level_data['victorias']
                 plays = level_data['intentos']
                 message += str(clears) + '次通关/' + str(plays) + '次游玩 ' + str(
