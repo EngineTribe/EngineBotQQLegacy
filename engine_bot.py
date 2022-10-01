@@ -125,8 +125,8 @@ async def command_report(data):
 
 
 async def command_query(data):
-    if data['message'].strip() == 'e!search':
-        send_group_msg(data['group_id'], '''❌ 使用方法: e!search 关卡ID''')
+    if data['message'].strip() == 'e!query':
+        send_group_msg(data['group_id'], '''❌ 使用方法: e!query 关卡ID''')
         return
     else:
         level_id = data['message'].split(' ')[1].upper()
