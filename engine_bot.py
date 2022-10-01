@@ -39,7 +39,8 @@ async def command_register(data):
                                                 'user_id': data['sender']['user_id'],
                                                 'api_key': ENGINE_TRIBE_API_KEY}).json()
             if 'success' in response_json:
-                send_group_msg(data['group_id'], '🎉 注册成功，现在可以使用 ' + response_json['username'] + ' 在游戏中登录了。')
+                send_group_msg(data['group_id'],
+                               '🎉 注册成功，现在可以使用 ' + response_json['username'] + ' 在游戏中登录了。')
             else:
                 if response_json['error_type'] == '035':
                     send_group_msg(data['group_id'], '❌ 注册失败。\n' + '一个 QQ 号只能注册一个帐号，' + '\n' +
@@ -143,7 +144,7 @@ async def command_query(data):
                 return
             else:
                 level_data = response_json['result']
-                message = '查询关卡: ' + level_data['name'] + '\n'
+                message = '🔍 查询关卡: ' + level_data['name'] + '\n'
                 message += '作者: ' + level_data['author']
                 if int(level_data['featured']) == 1:
                     message += ' (管理推荐关卡)'
@@ -155,7 +156,8 @@ async def command_query(data):
                 message += str(clears) + '次通关/' + str(plays) + '次游玩 ' + str(
                     round((int(clears) / int(plays)) * 100, 2)) + '%\n'
                 message += '标签: ' + level_data['etiquetas'] + ', 游戏风格: ' + styles[int(level_data['apariencia'])]
-
+                send_group_msg(group_id=data['group_id'], message=message)
+                return
         except Exception as e:
             send_group_msg(data['group_id'], '''❌ 命令出现错误，连接到引擎部落后端时出错。''' + str(e))
             return
