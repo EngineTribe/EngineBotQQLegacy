@@ -39,7 +39,7 @@ async def command_register(data):
                                                 'user_id': data['sender']['user_id'],
                                                 'api_key': ENGINE_TRIBE_API_KEY}).json()
             if 'success' in response_json:
-                send_group_msg(data['group_id'], response_json['success'])
+                send_group_msg(data['group_id'], '🎉 注册成功，现在可以使用 ' + response_json['username'] + '在游戏中登录了。')
             else:
                 if response_json['error_type'] == '035':
                     send_group_msg(data['group_id'], '❌ 注册失败。\n' + '一个 QQ 号只能注册一个帐号，' + '\n' +

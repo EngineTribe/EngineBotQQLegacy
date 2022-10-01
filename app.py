@@ -62,6 +62,17 @@ async def webhook_payload():
             return 'NotImplemented'
 
 
+@webhook_app.route('/enginetribe', methods=['POST'])
+async def webhook_enginetribe():
+    webhook = request.get_json()
+    if webhook['type'] == 'new_arrival':  # new arrival
+        message = '📤 ' + webhook['author'] + ' 上传了新关卡:' + webhook['level_name'] + '\n'
+        message += 'ID: ' + webhook['level_id']
+        for group in ENABLED_GROUPS:
+            send_group_msg(group_id=group, message=message)
+        return 'Success'
+
+
 def run_bot():
     bot_app.run(host=BOT_HOST, port=BOT_PORT, debug=DEBUG_MODE)
 
