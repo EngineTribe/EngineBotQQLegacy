@@ -71,6 +71,32 @@ async def webhook_enginetribe():
         for group in ENABLED_GROUPS:
             send_group_msg(group_id=group, message=message)
         return 'Success'
+    if 'likes' in webhook['type']:  # 10/100/1000 likes
+        message = '🎉 恭喜， ' + webhook['author'] + ' 上传的关卡 ' + webhook['level_name'] + ' 获得了 ' + webhook[
+            'type'].replace('_likes', '') + ' 个点赞!\n'
+        message += 'ID: ' + webhook['level_id']
+        for group in ENABLED_GROUPS:
+            send_group_msg(group_id=group, message=message)
+        return 'Success'
+    if 'plays' in webhook['type']:  # 100/1000 plays
+        message = '🎉 恭喜， ' + webhook['author'] + ' 上传的关卡 ' + webhook['level_name'] + ' 已经被游玩 ' + webhook[
+            'type'].replace('_plays', '') + ' 次!\n'
+        message += 'ID: ' + webhook['level_id']
+        for group in ENABLED_GROUPS:
+            send_group_msg(group_id=group, message=message)
+    if 'deaths' in webhook['type']:  # 100/1000 deaths
+        message = '🎉 ' + webhook['author'] + ' 上传的关卡 ' + webhook['level_name'] + ' 已经夺得了 ' + webhook[
+            'type'].replace('_deaths', '') + ' 个人头，快去挑战吧!\n'
+        message += 'ID: ' + webhook['level_id']
+        for group in ENABLED_GROUPS:
+            send_group_msg(group_id=group, message=message)
+        return 'Success'
+    if 'clears' in webhook['type']:  # 100/1000 clears
+        message = '🎉 恭喜， ' + webhook['author'] + ' 上传的关卡 ' + webhook['level_name'] + ' 已经被通关 ' + webhook[
+            'type'].replace('_clears', '') + ' 次，快去挑战吧!\n'
+        message += 'ID: ' + webhook['level_id']
+        for group in ENABLED_GROUPS:
+            send_group_msg(group_id=group, message=message)
 
 
 def run_bot():
