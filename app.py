@@ -88,6 +88,11 @@ async def webhook_enginetribe():
         message += 'ID: ' + webhook['level_id']
         for group in ENABLED_GROUPS:
             send_group_msg(group_id=group, message=message)
+    if webhook['type'] == 'new_featured':  # new featured
+        message = '🌟 ' + webhook['author'] + ' 的关卡 ' + webhook['level_name'] + ' 被加入了管理推荐关卡，快来玩!\n'
+        message += 'ID: ' + webhook['level_id']
+        for group in ENABLED_GROUPS:
+            send_group_msg(group_id=group, message=message)
         return 'Success'
     if 'likes' in webhook['type']:  # 10/100/1000 likes
         message = '🎉 恭喜， ' + webhook['author'] + ' 上传的关卡 ' + webhook['level_name'] + ' 获得了 ' + webhook[
@@ -103,7 +108,7 @@ async def webhook_enginetribe():
         for group in ENABLED_GROUPS:
             send_group_msg(group_id=group, message=message)
     if 'deaths' in webhook['type']:  # 100/1000 deaths
-        message = '🎉 ' + webhook['author'] + ' 上传的关卡 ' + webhook['level_name'] + ' 已经夺得了 ' + webhook[
+        message = '🔪 ' + webhook['author'] + ' 上传的关卡 ' + webhook['level_name'] + ' 已经夺得了 ' + webhook[
             'type'].replace('_deaths', '') + ' 个人头，快去挑战吧!\n'
         message += 'ID: ' + webhook['level_id']
         for group in ENABLED_GROUPS:
