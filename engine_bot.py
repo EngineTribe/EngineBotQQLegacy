@@ -220,7 +220,7 @@ async def command_stats(data):
                                             data='auth_code=' + BOT_AUTH_CODE + '&author=' + user_data[
                                                 'username']).json()
                 for level_data in levels_data['result']:
-                    message += '- ' + level_data['name'] + ' ' + level_data['level_id']
+                    message += '- ' + level_data['name'] + ' ' + level_data['id']
                     if int(level_data['featured']) == 1:
                         message += ' (推荐)'
                     message += '\n'
