@@ -37,15 +37,15 @@ async def command_register(data):
             password_hash = register_code[1]
             response_json = requests.post(url=ENGINE_TRIBE_HOST + '/user/register',
                                           json={'username': username, 'password_hash': password_hash,
-                                                'user_id': data['sender']['user_id'],
+                                                'user_id': str(data['sender']['user_id']),
                                                 'api_key': ENGINE_TRIBE_API_KEY}).json()
             if 'success' in response_json:
                 send_group_msg(data['group_id'],
-                               '🎉 注册成功，现在可以使用 ' + response_json['username'] + ' 在游戏中登录了。')
+                               '🎉 注册成功，现在可以使用 ' + str(response_json['username']) + ' 在游戏中登录了。')
             else:
                 if response_json['error_type'] == '035':
                     send_group_msg(data['group_id'], '❌ 注册失败。\n' + '一个 QQ 号只能注册一个帐号，' + '\n' +
-                                   response_json['user_id'] + ' 不能再注册账号了。')
+                                   str(response_json['user_id']) + ' 不能再注册账号了。')
                 elif response_json['error_type'] == '036':
                     send_group_msg(data['group_id'], '❌ 注册失败。\n' + response_json['username'] +
                                    ' 用户名已经存在，请回到注册网页换一个用户名。')
