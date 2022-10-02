@@ -25,7 +25,6 @@ async def bot():
                                response_json['username'] + ' 已经退群，所以帐号暂时冻结。下次入群时将恢复可玩。')
             else:
                 send_group_msg(data['group_id'], '❌ 冻结帐号失败，' + str(data['user_id']) + '并没有注册引擎部落账号。')
-                return
             return 'Success'
         if data['notice_type'] == 'group_increase':
             requests.post(url=ENGINE_TRIBE_HOST + '/user/update_permission',
@@ -89,10 +88,12 @@ async def webhook_enginetribe():
         message += 'ID: ' + webhook['level_id']
         for group in ENABLED_GROUPS:
             send_group_msg(group_id=group, message=message)
+        return 'Success'
     if webhook['type'] == 'new_deleted':  # new deleted
         message = '🗑️ ' + webhook['author'] + ' 删除了关卡:' + webhook['level_name']
         for group in ENABLED_GROUPS:
             send_group_msg(group_id=group, message=message)
+        return 'Success'
     if webhook['type'] == 'new_featured':  # new featured
         message = '🌟 ' + webhook['author'] + ' 的关卡 ' + webhook['level_name'] + ' 被加入了管理推荐关卡，快来玩!\n'
         message += 'ID: ' + webhook['level_id']
@@ -112,6 +113,7 @@ async def webhook_enginetribe():
         message += 'ID: ' + webhook['level_id']
         for group in ENABLED_GROUPS:
             send_group_msg(group_id=group, message=message)
+        return 'Success'
     if 'deaths' in webhook['type']:  # 100/1000 deaths
         message = '🔪 ' + webhook['author'] + ' 上传的关卡 ' + webhook['level_name'] + ' 已经夺得了 ' + webhook[
             'type'].replace('_deaths', '') + ' 个人头，快去挑战吧!\n'
@@ -125,6 +127,7 @@ async def webhook_enginetribe():
         message += 'ID: ' + webhook['level_id']
         for group in ENABLED_GROUPS:
             send_group_msg(group_id=group, message=message)
+        return 'Success'
 
 
 def run_bot():
