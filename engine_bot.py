@@ -201,7 +201,7 @@ async def command_query(data):
 async def command_stats(data):
     try:
         response_json = requests.post(url=ENGINE_TRIBE_HOST + '/user/info',
-                                      json={'username': data['sender']['user_id']}).json()
+                                      json={'user_id': data['sender']['user_id']}).json()
         if 'error_type' in response_json:
             send_group_msg(data['group_id'], '''❌ 你还没注册账号。''')
             return
