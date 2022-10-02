@@ -42,7 +42,8 @@ async def bot():
             'e!permission': command_permission,
             'e!report': command_report,
             'e!query': command_query,
-            'e!ban': command_ban
+            'e!ban': command_ban,
+            'e!stats': command_stats
         }
         await commands[data['message'].strip().split(' ')[0]](data)
         return 'Success'

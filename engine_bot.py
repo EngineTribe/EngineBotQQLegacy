@@ -11,7 +11,8 @@ async def command_help(data):
 e!help : 查看此帮助。
 e!register : 注册帐号。
 e!query : 查询关卡。
-e!report : 举报关卡。'''
+e!report : 举报关卡。
+e!stats : 我的上传记录。'''
     if data['sender']['user_id'] in BOT_ADMIN:
         retval += '''
 📑 可用的管理命令:
@@ -151,7 +152,8 @@ async def command_report(data):
             send_group_msg(group_id=ADMIN_GROUP, message=message)
             return
     except Exception as e:
-        send_group_msg(data['group_id'], level_id + '''\n❌ 获得被举报的关卡信息时出现错误，连接到引擎部落后端时出错。\n''' + str(e))
+        send_group_msg(data['group_id'],
+                       level_id + '''\n❌ 获得被举报的关卡信息时出现错误，连接到引擎部落后端时出错。\n''' + str(e))
         return
 
 
@@ -194,6 +196,46 @@ async def command_query(data):
         except Exception as e:
             send_group_msg(data['group_id'], '''❌ 命令出现错误，连接到引擎部落后端时出错。''' + str(e))
             return
+
+
+async def command_stats(data):
+    try:
+        response_json = requests.post(url=ENGINE_TRIBE_HOST + '/user/info',
+                                      json={'username': data['sender']['user_id']}).json()
+        if 'error_type' in response_json:
+            send_group_msg(data['group_id'], '''❌ 你还没注册账号。''')
+            return
+        else:
+            user_data = response_json['result']
+            message = '📜 玩家 ' + user_data['username'] + ' 的上传记录\n'
+            message += '共上传了 ' + str(user_data['uploads']) + ' 个关卡。'
+            if str(user_data['uploads']) == '0':
+                send_group_msg(group_id=data['group_id'], message=message)
+            else:
+                all_likes = 0
+                all_dislikes = 0
+                all_plays = 0
+                message += '\n'
+                levels_data = requests.post(url=ENGINE_TRIBE_HOST + '/stages/detailed_search',
+                                            data='auth_code=' + BOT_AUTH_CODE + '&author=' + user_data[
+                                                'username']).json()
+                for level_data in levels_data['results']:
+                    message += '- ' + level_data['name'] + ' ' + level_data['level_id']
+                    if int(level_data['featured']) == 1:
+                        message += ' (推荐)'
+                    message += '\n'
+                    all_likes += level_data['likes']
+                    all_dislikes += level_data['dislikes']
+                    all_plays += level_data['plays']
+                    message += '  ' + str(level_data['likes']) + '❤ ' + str(level_data['dislikes']) + '💙\n'
+                    message += '  标签: ' + level_data['etiquetas'] + ', 游戏风格: ' + styles[
+                        int(level_data['apariencia'])]
+                message += '总获赞: ' + str(all_likes) + ' 总获孬: ' + str(all_dislikes) + ' 总游玩: ' + str(all_plays)
+                send_group_msg(group_id=data['group_id'], message=message)
+            return
+    except Exception as e:
+        send_group_msg(data['group_id'], '''❌ 命令出现错误，连接到引擎部落后端时出错。''' + str(e))
+        return
 
 
 def prettify_level_id(level_id: str):
