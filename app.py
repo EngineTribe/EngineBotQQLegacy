@@ -35,6 +35,7 @@ async def bot():
         if not data['group_id'] in ENABLED_GROUPS:
             # bot only works in enabled groups
             return 'failed'
+        delete_msg(data['message_id'])
         commands = {
             'e!help': command_help,
             'e!register': command_register,
