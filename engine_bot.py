@@ -219,6 +219,7 @@ async def command_stats(data):
                 levels_data = requests.post(url=ENGINE_TRIBE_HOST + '/stages/detailed_search',
                                             data='auth_code=' + BOT_AUTH_CODE + '&author=' + user_data[
                                                 'username']).json()
+                print(levels_data)
                 for level_data in levels_data['results']:
                     message += '- ' + level_data['name'] + ' ' + level_data['level_id']
                     if int(level_data['featured']) == 1:
