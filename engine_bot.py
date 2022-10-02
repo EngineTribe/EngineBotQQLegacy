@@ -224,9 +224,9 @@ async def command_stats(data):
                     if int(level_data['featured']) == 1:
                         message += ' (推荐)'
                     message += '\n'
-                    all_likes += level_data['likes']
-                    all_dislikes += level_data['dislikes']
-                    all_plays += level_data['plays']
+                    all_likes += int(level_data['likes'])
+                    all_dislikes += int(level_data['dislikes'])
+                    all_plays += int(level_data['plays'])
                     message += '  ' + str(level_data['likes']) + '❤ ' + str(level_data['dislikes']) + '💙\n'
                     message += '  标签: ' + level_data['etiquetas'] + ', 游戏风格: ' + styles[
                         int(level_data['apariencia'])]
