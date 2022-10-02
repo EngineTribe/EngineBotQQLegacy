@@ -120,9 +120,39 @@ async def command_report(data):
         return
     else:
         level_id = data['message'].split(' ')[1]
-        for admin in GAME_ADMIN:
-            message = '⚠ 接到举报 ' + level_id
-            send_private_msg(user_id=admin, message=message)
+        if '-' not in level_id:
+            level_id = prettify_level_id(level_id)
+        if len(level_id) != 19:
+            send_group_msg(data['group_id'], '''❌ 无效的关卡 ID。''')
+            return
+    try:
+        response_json = requests.post(url=ENGINE_TRIBE_HOST + '/stage/' + level_id,
+                                      data='auth_code=' + BOT_AUTH_CODE).json()
+        if 'error_type' in response_json:
+            send_group_msg(data['group_id'], '''❌ 关卡未找到。''')
+            return
+        else:
+            level_data = response_json['result']
+            response_json_user = requests.post(url=ENGINE_TRIBE_HOST + '/user/info',
+                                               json={'username': level_data['author']}).json()
+            message = '⚠ 接到举报: ' + level_id + ' ' + level_data['name'] + '\n'
+            message += '作者: ' + level_data['author'] + '\n'
+            message += '作者 QQ: ' + str(response_json_user['result']['user_id']) + '\n'
+            message += '上传于 ' + level_data['date']
+            message += '  ' + str(level_data['likes']) + '❤ ' + str(level_data['dislikes']) + '💙\n'
+            clears = level_data['victorias']
+            plays = level_data['intentos']
+            if int(plays) == 0:
+                message += str(clears) + '次通关/' + str(plays) + '次游玩\n'
+            else:
+                message += str(clears) + '次通关/' + str(plays) + '次游玩 ' + str(
+                    round((int(clears) / int(plays)) * 100, 2)) + '%\n'
+            message += '标签: ' + level_data['etiquetas'] + ', 游戏风格: ' + styles[int(level_data['apariencia'])]
+            send_group_msg(group_id=ADMIN_GROUP, message=message)
+            return
+    except Exception as e:
+        send_group_msg(data['group_id'], level_id + '''\n❌ 获得被举报的关卡信息时出现错误，连接到引擎部落后端时出错。\n''' + str(e))
+        return
 
 
 async def command_query(data):
@@ -153,8 +183,11 @@ async def command_query(data):
                 message += '  ' + str(level_data['likes']) + '❤ ' + str(level_data['dislikes']) + '💙\n'
                 clears = level_data['victorias']
                 plays = level_data['intentos']
-                message += str(clears) + '次通关/' + str(plays) + '次游玩 ' + str(
-                    round((int(clears) / int(plays)) * 100, 2)) + '%\n'
+                if int(plays) == 0:
+                    message += str(clears) + '次通关/' + str(plays) + '次游玩\n'
+                else:
+                    message += str(clears) + '次通关/' + str(plays) + '次游玩 ' + str(
+                        round((int(clears) / int(plays)) * 100, 2)) + '%\n'
                 message += '标签: ' + level_data['etiquetas'] + ', 游戏风格: ' + styles[int(level_data['apariencia'])]
                 send_group_msg(group_id=data['group_id'], message=message)
                 return
