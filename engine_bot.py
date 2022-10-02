@@ -220,16 +220,15 @@ async def command_stats(data):
                                             data='auth_code=' + BOT_AUTH_CODE + '&author=' + user_data[
                                                 'username']).json()
                 for level_data in levels_data['result']:
-                    message += '- ' + level_data['name'] + ' ' + level_data['id']
+                    message += '- ' + level_data['name'] + ' ' + str(level_data['likes']) + '❤ ' + str(
+                        level_data['dislikes']) + '💙\n  ' + level_data['id']
                     if int(level_data['featured']) == 1:
                         message += ' (推荐)'
                     message += '\n'
                     all_likes += int(level_data['likes'])
                     all_dislikes += int(level_data['dislikes'])
                     all_plays += int(level_data['intentos'])
-                    message += '  ' + str(level_data['likes']) + '❤ ' + str(level_data['dislikes']) + '💙\n'
-                    message += '  标签: ' + level_data['etiquetas'] + ', 游戏风格: ' + styles[
-                        int(level_data['apariencia'])]
+                    message += '  标签: ' + level_data['etiquetas'] + '\n'
                 message += '总获赞: ' + str(all_likes) + ' 总获孬: ' + str(all_dislikes) + ' 总游玩: ' + str(all_plays)
                 send_group_msg(group_id=data['group_id'], message=message)
             return
