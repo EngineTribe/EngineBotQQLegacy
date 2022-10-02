@@ -226,7 +226,7 @@ async def command_stats(data):
                     message += '\n'
                     all_likes += int(level_data['likes'])
                     all_dislikes += int(level_data['dislikes'])
-                    all_plays += int(level_data['plays'])
+                    all_plays += int(level_data['intentos'])
                     message += '  ' + str(level_data['likes']) + '❤ ' + str(level_data['dislikes']) + '💙\n'
                     message += '  标签: ' + level_data['etiquetas'] + ', 游戏风格: ' + styles[
                         int(level_data['apariencia'])]
