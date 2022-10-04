@@ -25,12 +25,10 @@ async def bot():
                                response_json['username'] + ' 已经退群，所以帐号暂时冻结。下次入群时将恢复可玩。')
             else:
                 send_group_msg(data['group_id'], '❌ 冻结帐号失败，' + str(data['user_id']) + '并没有注册引擎部落账号。')
-            return 'Success'
         if data['notice_type'] == 'group_increase':
             requests.post(url=ENGINE_TRIBE_HOST + '/user/update_permission',
                           json={'user_id': data['user_id'], 'permission': 'valid', 'value': True,
                                 'api_key': ENGINE_TRIBE_API_KEY}).json()
-            return 'Success'
     else:
         if not data['group_id'] in ENABLED_GROUPS:
             # bot only works in enabled groups
@@ -46,7 +44,7 @@ async def bot():
             'e!stats': command_stats
         }
         await commands[data['message'].strip().split(' ')[0]](data)
-        return 'Success'
+    return 'Success'
 
 
 # GitHub webhook
