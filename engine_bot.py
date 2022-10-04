@@ -28,7 +28,8 @@ e!unban : 解封用户。'''
 
 async def command_register(data):
     if data['message'].strip() == 'e!register':
-        send_group_msg(data['group_id'], '''🔗 打开 https://web.enginetribe.gq/register.html 以查看注册流程。''')
+        send_group_msg(data['group_id'], '🔗 打开 https://web.enginetribe.gq/register.html 以注册。\n   打开 '
+                                         'https://web.enginetribe.gq/change_password.html 以修改密码。')
         return
     else:
         try:
