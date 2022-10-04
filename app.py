@@ -92,11 +92,6 @@ async def webhook_enginetribe():
         for group in ENABLED_GROUPS:
             send_group_msg(group_id=group, message=message)
         return 'Success'
-    if webhook['type'] == 'new_deleted':  # new deleted
-        message = '🗑️ ' + webhook['author'] + ' 删除了关卡:' + webhook['level_name']
-        for group in ENABLED_GROUPS:
-            send_group_msg(group_id=group, message=message)
-        return 'Success'
     if webhook['type'] == 'new_featured':  # new featured
         message = '🌟 ' + webhook['author'] + ' 的关卡 ' + webhook['level_name'] + ' 被加入了管理推荐关卡，快来玩!\n'
         message += 'ID: ' + webhook['level_id']
