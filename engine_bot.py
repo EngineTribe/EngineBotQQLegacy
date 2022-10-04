@@ -55,7 +55,7 @@ async def command_register(data):
 
 
         except Exception as e:
-            send_group_msg(data['group_id'], '❌ 无效的注册码。\n' + str(e))
+            send_group_msg(data['group_id'], '❌ 无效的注册码，请检查是否复制完全。\n' + str(e))
             return
 
 
@@ -143,11 +143,12 @@ async def command_report(data):
             message += '  ' + str(level_data['likes']) + '❤ ' + str(level_data['dislikes']) + '💙\n'
             clears = level_data['victorias']
             plays = level_data['intentos']
+            deaths = level_data['muertes']
             if int(plays) == 0:
                 message += str(clears) + '次通关/' + str(plays) + '次游玩\n'
             else:
                 message += str(clears) + '次通关/' + str(plays) + '次游玩 ' + str(
-                    round((int(clears) / int(plays)) * 100, 2)) + '%\n'
+                    round((int(clears) / int(deaths)) * 100, 2)) + '%\n'
             message += '标签: ' + level_data['etiquetas'] + ', 游戏风格: ' + styles[int(level_data['apariencia'])]
             send_group_msg(group_id=ADMIN_GROUP, message=message)
             return
@@ -185,11 +186,12 @@ async def command_query(data):
                 message += '  ' + str(level_data['likes']) + '❤ ' + str(level_data['dislikes']) + '💙\n'
                 clears = level_data['victorias']
                 plays = level_data['intentos']
+                deaths = level_data['muertes']
                 if int(plays) == 0:
                     message += str(clears) + '次通关/' + str(plays) + '次游玩\n'
                 else:
                     message += str(clears) + '次通关/' + str(plays) + '次游玩 ' + str(
-                        round((int(clears) / int(plays)) * 100, 2)) + '%\n'
+                        round((int(clears) / int(deaths)) * 100, 2)) + '%\n'
                 message += '标签: ' + level_data['etiquetas'] + ', 游戏风格: ' + styles[int(level_data['apariencia'])]
                 send_group_msg(group_id=data['group_id'], message=message)
                 return
