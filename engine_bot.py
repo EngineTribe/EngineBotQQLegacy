@@ -171,7 +171,8 @@ async def command_query(data):
             return
         try:
             response_json = requests.post(url=ENGINE_TRIBE_HOST + '/stage/' + level_id,
-                                          data='auth_code=' + BOT_AUTH_CODE).json()
+                                          data='auth_code=' + BOT_AUTH_CODE,
+                                          headers={'Content-Type': 'application/x-www-form-urlencoded'}).json()
             if 'error_type' in response_json:
                 send_group_msg(data['group_id'], '''❌ 关卡未找到。''')
                 return
@@ -219,8 +220,8 @@ async def command_stats(data):
                 all_plays = 0
                 message += '\n'
                 levels_data = requests.post(url=ENGINE_TRIBE_HOST + '/stages/detailed_search',
-                                            data='auth_code=' + BOT_AUTH_CODE + '&author=' + user_data[
-                                                'username']).json()
+                                            data={'auth_code': BOT_AUTH_CODE, 'author': user_data['username']},
+                                            headers={'Content-Type': 'application/x-www-form-urlencoded'}).json()
                 for level_data in levels_data['result']:
                     message += '- ' + level_data['name'] + ' ' + str(level_data['likes']) + '❤ ' + str(
                         level_data['dislikes']) + '💙\n  ' + level_data['id']
