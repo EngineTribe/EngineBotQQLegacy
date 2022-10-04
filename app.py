@@ -41,9 +41,13 @@ async def bot():
             'e!report': command_report,
             'e!query': command_query,
             'e!ban': command_ban,
+            'e!unban': command_unban,
             'e!stats': command_stats
         }
-        await commands[data['message'].strip().split(' ')[0]](data)
+        try:
+            await commands[data['message'].strip().split(' ')[0]](data)
+        except:
+            send_group_msg(data['group_id'], '❌ 命令用法不正确。')
     return 'Success'
 
 

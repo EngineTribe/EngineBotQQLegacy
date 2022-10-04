@@ -9,10 +9,10 @@ styles = ['超马1', '超马3', '超马世界', '新超马U']
 async def command_help(data):
     retval = '''📑 可用的命令 (输入命令以查看用法):
 e!help : 查看此帮助。
-e!register : 注册帐号。
-e!query : 查询关卡。
+e!register : 注册帐号或修改密码。
+e!query : 查询关卡信息。
 e!report : 举报关卡。
-e!stats : 我的上传记录。'''
+e!stats : 查看上传记录。'''
     if data['sender']['user_id'] in BOT_ADMIN:
         retval += '''
 📑 可用的管理命令:
@@ -20,7 +20,8 @@ e!permission : 更新用户权限。'''
     if data['sender']['user_id'] in GAME_ADMIN:
         retval += '''
 📑 可用的游戏管理命令:
-e!ban : 封禁用户。'''
+e!ban : 封禁用户。
+e!unban : 解封用户。'''
     send_group_msg(group_id=data['group_id'], message=retval)
     return
 
@@ -33,29 +34,39 @@ async def command_register(data):
         try:
             raw_register_code = data['message'].split(' ')[1]
             register_code = base64.b64decode(raw_register_code.strip().encode()).decode().split("\n")
-            username = register_code[0]
-            password_hash = register_code[1]
-            response_json = requests.post(url=ENGINE_TRIBE_HOST + '/user/register',
-                                          json={'username': username, 'password_hash': password_hash,
-                                                'user_id': str(data['sender']['user_id']),
-                                                'api_key': ENGINE_TRIBE_API_KEY}).json()
-            if 'success' in response_json:
-                send_group_msg(data['group_id'],
-                               '🎉 注册成功，现在可以使用 ' + str(response_json['username']) + ' 在游戏中登录了。')
-            else:
-                if response_json['error_type'] == '035':
-                    send_group_msg(data['group_id'], '❌ 注册失败。\n' + '一个 QQ 号只能注册一个帐号，' + '\n' +
-                                   str(response_json['user_id']) + ' 不能再注册账号了。')
-                elif response_json['error_type'] == '036':
-                    send_group_msg(data['group_id'], '❌ 注册失败。\n' + response_json['username'] +
-                                   ' 用户名已经存在，请回到注册网页换一个用户名。')
+            operation = register_code[0]
+            username = register_code[1]
+            password_hash = register_code[2]
+            if operation == 'r':  # register
+                response_json = requests.post(url=ENGINE_TRIBE_HOST + '/user/register',
+                                              json={'username': username, 'password_hash': password_hash,
+                                                    'user_id': str(data['sender']['user_id']),
+                                                    'api_key': ENGINE_TRIBE_API_KEY}).json()
+                if 'success' in response_json:
+                    send_group_msg(data['group_id'],
+                                   '🎉 注册成功，现在可以使用 ' + str(response_json['username']) + ' 在游戏中登录了。')
                 else:
-                    send_group_msg(data['group_id'], '❌ 注册失败，发生未知错误。\n' + response_json['error_type'] + '\n' +
-                                   response_json['message'])
-
-
+                    if response_json['error_type'] == '035':
+                        send_group_msg(data['group_id'], '❌ 注册失败。\n' + '一个 QQ 号只能注册一个帐号，' + '\n' +
+                                       str(response_json['user_id']) + ' 不能再注册账号了。')
+                    elif response_json['error_type'] == '036':
+                        send_group_msg(data['group_id'], '❌ 注册失败。\n' + response_json['username'] +
+                                       ' 用户名已经存在，请回到注册网页换一个用户名。')
+                    else:
+                        send_group_msg(data['group_id'],
+                                       '❌ 注册失败，发生未知错误。\n' + response_json['error_type'] + '\n' +
+                                       response_json['message'])
+            elif operation == 'c':  # change password
+                response_json = requests.post(url=ENGINE_TRIBE_HOST + '/user/update_password',
+                                              json={'username': username, 'password_hash': password_hash,
+                                                    'api_key': ENGINE_TRIBE_API_KEY}).json()
+                if 'success' in response_json:
+                    send_group_msg(data['group_id'],
+                                   '🎉 ' + str(response_json['username']) + ' 的密码修改成功。')
+                else:
+                    send_group_msg(data['group_id'], '❌ 修改密码失败，用户不存在。')
         except Exception as e:
-            send_group_msg(data['group_id'], '❌ 无效的注册码，请检查是否复制完全。\n' + str(e))
+            send_group_msg(data['group_id'], '❌ 无效的注册码，请检查是否复制完全。\n错误信息: ' + str(e))
             return
 
 
@@ -76,6 +87,31 @@ async def command_ban(data):
             if 'success' in response_json:
                 send_group_msg(data['group_id'],
                                '✅ 成功封禁 ' + username + '。')
+            else:
+                send_group_msg(data['group_id'], '❌ 权限更新失败。\n' + str(response_json))
+                return
+        except Exception as e:
+            send_group_msg(data['group_id'], '❌ 命令出现错误。\n' + str(e))
+            return
+
+
+async def command_unban(data):
+    if not data['sender']['user_id'] in GAME_ADMIN:
+        send_group_msg(data['group_id'], '❌ 无权使用该命令。')
+        return
+    if data['message'].strip() == 'e!unban':
+        send_group_msg(data['group_id'],
+                       '使用方法: e!unban 用户名')
+        return
+    else:
+        try:
+            username = data['message'].split(' ')[1]
+            response_json = requests.post(url=ENGINE_TRIBE_HOST + '/user/update_permission',
+                                          json={'username': username, 'permission': 'banned',
+                                                'value': False, 'api_key': ENGINE_TRIBE_API_KEY}).json()
+            if 'success' in response_json:
+                send_group_msg(data['group_id'],
+                               '✅ 成功解除封禁 ' + username + '。')
             else:
                 send_group_msg(data['group_id'], '❌ 权限更新失败。\n' + str(response_json))
                 return
