@@ -12,7 +12,8 @@ e!help : 查看此帮助。
 e!register : 注册帐号或修改密码。
 e!query : 查询关卡信息。
 e!report : 举报关卡。
-e!stats : 查看上传记录。'''
+e!stats : 查看上传记录。
+e!random : 来个随机关卡。'''
     if data['sender']['user_id'] in BOT_ADMIN:
         retval += '''
 📑 可用的管理命令:
@@ -165,7 +166,9 @@ async def command_report(data):
             return
     try:
         response_json = requests.post(url=ENGINE_TRIBE_HOST + '/stage/' + level_id,
-                                      data='auth_code=' + BOT_AUTH_CODE).json()
+                                      data='auth_code=' + BOT_AUTH_CODE,
+                                      headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                               'User-Agent': 'EngineBot/1'}).json()
         if 'error_type' in response_json:
             send_group_msg(data['group_id'], '''❌ 关卡未找到。''')
             return
@@ -209,7 +212,8 @@ async def command_query(data):
         try:
             response_json = requests.post(url=ENGINE_TRIBE_HOST + '/stage/' + level_id,
                                           data='auth_code=' + BOT_AUTH_CODE,
-                                          headers={'Content-Type': 'application/x-www-form-urlencoded'}).json()
+                                          headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                                   'User-Agent': 'EngineBot/1'}).json()
             if 'error_type' in response_json:
                 send_group_msg(data['group_id'], '''❌ 关卡未找到。''')
                 return
@@ -238,12 +242,47 @@ async def command_query(data):
             return
 
 
+async def command_random(data):
+    try:
+        response_json = requests.post(url=ENGINE_TRIBE_HOST + '/stage/random',
+                                      data='auth_code=' + BOT_AUTH_CODE,
+                                      headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                               'User-Agent': 'EngineBot/1'}).json()
+        level_data = response_json['result']
+        message = '💫 随机关卡: ' + level_data['name'] + '\n'
+        message += 'ID: ' + level_data['id'] + '\n'
+        message += '作者: ' + level_data['author']
+        if int(level_data['featured']) == 1:
+            message += ' (管理推荐关卡)'
+        message += '\n'
+        message += '上传于 ' + level_data['date']
+        message += '  ' + str(level_data['likes']) + '❤ ' + str(level_data['dislikes']) + '💙\n'
+        clears = level_data['victorias']
+        plays = level_data['intentos']
+        deaths = level_data['muertes']
+        if int(plays) == 0:
+            message += str(clears) + '次通关/' + str(plays) + '次游玩\n'
+        else:
+            message += str(clears) + '次通关/' + str(plays) + '次游玩 ' + str(
+                round((int(clears) / int(deaths)) * 100, 2)) + '%\n'
+        message += '标签: ' + level_data['etiquetas'] + ', 游戏风格: ' + styles[int(level_data['apariencia'])]
+        send_group_msg(group_id=data['group_id'], message=message)
+        return
+    except Exception as e:
+        send_group_msg(data['group_id'], '''❌ 命令出现错误，连接到引擎部落后端时出错。''' + str(e))
+        return
+
+
 async def command_stats(data):
+    if data['message'].strip() == 'e!stats':
+        request_body = {'user_id': data['sender']['user_id']}
+    else:
+        request_body = {'username': data['message'].replace('e!stats', '').strip()}
     try:
         response_json = requests.post(url=ENGINE_TRIBE_HOST + '/user/info',
-                                      json={'user_id': data['sender']['user_id']}).json()
+                                      json=request_body).json()
         if 'error_type' in response_json:
-            send_group_msg(data['group_id'], '''❌ 你还没注册账号。''')
+            send_group_msg(data['group_id'], '''❌ 数据不存在。''')
             return
         else:
             user_data = response_json['result']

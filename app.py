@@ -42,7 +42,8 @@ async def bot():
             'e!query': command_query,
             'e!ban': command_ban,
             'e!unban': command_unban,
-            'e!stats': command_stats
+            'e!stats': command_stats,
+            'e!random': command_random
         }
         try:
             await commands[data['message'].strip().split(' ')[0]](data)
