@@ -280,7 +280,9 @@ async def command_stats(data):
         request_body = {'username': data['message'].replace('e!stats', '').strip()}
     try:
         response_json = requests.post(url=ENGINE_TRIBE_HOST + '/user/info',
-                                      json=request_body).json()
+                                      json=request_body,
+                                      headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                               'User-Agent': 'EngineBot/1'}).json()
         if 'error_type' in response_json:
             send_group_msg(data['group_id'], '''❌ 数据不存在。''')
             return
