@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from config import *
-import json
 import threading
 from time import sleep
 from engine_bot import *

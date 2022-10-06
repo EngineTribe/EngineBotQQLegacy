@@ -286,21 +286,22 @@ async def command_stats(data):
             return
         else:
             user_data = response_json['result']
+            messages = []
             message = '📜 玩家 ' + user_data['username'] + ' 的上传记录\n'
             message += '共上传了 ' + str(user_data['uploads']) + ' 个关卡。'
+            messages.append(message)
             if str(user_data['uploads']) == '0':
                 send_group_msg(group_id=data['group_id'], message=message)
             else:
                 all_likes = 0
                 all_dislikes = 0
                 all_plays = 0
-                message += '\n'
                 levels_data = requests.post(url=ENGINE_TRIBE_HOST + '/stages/detailed_search',
                                             data={'auth_code': BOT_AUTH_CODE, 'author': user_data['username']},
                                             headers={'Content-Type': 'application/x-www-form-urlencoded',
                                                      'User-Agent': 'EngineBot/1'}).json()
                 for level_data in levels_data['result']:
-                    message += '- ' + level_data['name'] + ' ' + str(level_data['likes']) + '❤ ' + str(
+                    message = '- ' + level_data['name'] + ' ' + str(level_data['likes']) + '❤ ' + str(
                         level_data['dislikes']) + '💙\n  ' + level_data['id']
                     if int(level_data['featured']) == 1:
                         message += ' (推荐)'
@@ -309,8 +310,10 @@ async def command_stats(data):
                     all_dislikes += int(level_data['dislikes'])
                     all_plays += int(level_data['intentos'])
                     message += '  标签: ' + level_data['etiquetas'] + '\n'
-                message += '总获赞: ' + str(all_likes) + ' 总获孬: ' + str(all_dislikes) + ' 总游玩: ' + str(all_plays)
-                send_group_msg(group_id=data['group_id'], message=message)
+                    messages.append(message)
+                message = '总获赞: ' + str(all_likes) + ' 总获孬: ' + str(all_dislikes) + ' 总游玩: ' + str(all_plays)
+                messages.append(message)
+                send_group_forward_msg(group_id=data['group_id'], messages=messages, sender_name='记录查询')
             return
     except Exception as e:
         send_group_msg(data['group_id'], '''❌ 命令出现错误，连接到引擎部落后端时出错。''' + str(e))
