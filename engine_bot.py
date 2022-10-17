@@ -330,7 +330,7 @@ async def command_server(data):
         retval += f'👥 玩家数量: {response_json["player_count"]}\n'
         retval += f'🌏 关卡数量: {response_json["level_count"]}\n'
         retval += f'🕰️ 运行时间: {int(response_json["uptime"] / 60)} 分钟\n'
-        retval += f'📊 每分钟连接数: `{response_json["connection_per_minute"]}'
+        retval += f'📊 每分钟连接数: {response_json["connection_per_minute"]}'
         send_group_msg(data['group_id'], retval)
         return
     except Exception as e:
