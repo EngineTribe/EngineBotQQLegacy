@@ -13,7 +13,8 @@ e!register : 注册帐号或修改密码。
 e!query : 查询关卡信息。
 e!report : 举报关卡。
 e!stats : 查看上传记录。
-e!random : 来个随机关卡。'''
+e!random : 来个随机关卡。
+e!server : 服务器状态。'''
     if data['sender']['user_id'] in BOT_ADMIN:
         retval += '''
 📑 可用的管理命令:
@@ -144,7 +145,7 @@ async def command_permission(data):
                                                 'value': value, 'api_key': ENGINE_TRIBE_API_KEY}).json()
             if 'success' in response_json:
                 send_group_msg(data['group_id'],
-                               '✅ 成功将 ' + username + ' 的 ' + permission + ' 权限更新为 ' + str(value) + '。')
+                               f'✅ 成功将 {username} 的 {permission} 权限更新为 {str(value)} 。')
             else:
                 send_group_msg(data['group_id'], '❌ 权限更新失败。\n' + str(response_json))
                 return
@@ -176,7 +177,7 @@ async def command_report(data):
             level_data = response_json['result']
             response_json_user = requests.post(url=ENGINE_TRIBE_HOST + '/user/info',
                                                json={'username': level_data['author']}).json()
-            message = '⚠ 接到举报: ' + level_id + ' ' + level_data['name'] + '\n'
+            message = f'⚠ 接到举报: {level_id} {level_data["name"]} \n'
             message += '作者: ' + level_data['author'] + '\n'
             message += '作者 QQ: ' + str(response_json_user['result']['user_id']) + '\n'
             message += '上传于 ' + level_data['date']
@@ -317,6 +318,23 @@ async def command_stats(data):
             return
     except Exception as e:
         send_group_msg(data['group_id'], '''❌ 命令出现错误，连接到引擎部落后端时出错。''' + str(e))
+        return
+
+
+async def command_server(data):
+    try:
+        response_json = requests.get(url=ENGINE_TRIBE_HOST + '/server_stats').json()
+        retval = '🗄️ 服务器状态\n'
+        retval += f'🐧 操作系统: {response_json["os"]}\n'
+        retval += f'🐍 Python 版本: {response_json["python"]}\n'
+        retval += f'👥 玩家数量: {response_json["player_count"]}\n'
+        retval += f'🌏 关卡数量: {response_json["level_count"]}\n'
+        retval += f'🕰️ 运行时间: {int(response_json["uptime"] / 60)} 分钟\n'
+        retval += f'📊 每分钟连接数: `{response_json["connection_per_minute"]}'
+        send_group_msg(data['group_id'], retval)
+        return
+    except Exception as e:
+        send_group_msg(data['group_id'], 'Unknown error ' + str(e))
         return
 
 
