@@ -36,8 +36,8 @@ async def command_register(data):
     else:
         try:
             raw_register_code = data['message'].split(' ')[1]
-            register_code = base64.b64decode(raw_register_code.strip().encode()).decode()\
-                .replace('\r\n','\n').replace('\r','\n').split('\n')
+            register_code = base64.b64decode(raw_register_code.strip().encode()).decode() \
+                .replace('\r\n', '\n').replace('\r', '\n').split('\n')
             operation = register_code[0]
             username = register_code[1]
             password_hash = register_code[2]
@@ -63,13 +63,15 @@ async def command_register(data):
                                        f'{response_json["error_type"]}\n'
                                        f'{response_json["message"]}')
             elif operation == 'c':  # change password
+                old_password_hash = register_code[3]
                 response_json = requests.post(url=ENGINE_TRIBE_HOST + '/user/update_password',
                                               json={'username': username, 'password_hash': password_hash,
+                                                    'old_password_hash': old_password_hash,
                                                     'api_key': ENGINE_TRIBE_API_KEY}).json()
                 if 'success' in response_json:
                     send_group_msg(data['group_id'], f'🎉 {str(response_json["username"])} 的密码修改成功。')
                 else:
-                    send_group_msg(data['group_id'], '❌ 修改密码失败，用户不存在。')
+                    send_group_msg(data['group_id'], '❌ 修改密码失败，可能是用户不存在或原密码错误。')
         except Exception as e:
             send_group_msg(data['group_id'], '❌ 无效的注册码，请检查是否复制完全。\n'
                                              '错误信息: ' + str(e))
