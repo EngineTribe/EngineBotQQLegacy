@@ -36,7 +36,8 @@ async def command_register(data):
     else:
         try:
             raw_register_code = data['message'].split(' ')[1]
-            register_code = base64.b64decode(raw_register_code.strip().encode()).decode().split("\n")
+            register_code = base64.b64decode(raw_register_code.strip().encode()).decode()\
+                .replace('\r\n','\n').replace('\r','\n').split('\n')
             operation = register_code[0]
             username = register_code[1]
             password_hash = register_code[2]
@@ -50,26 +51,28 @@ async def command_register(data):
                                    '🎉 注册成功，现在可以使用 ' + str(response_json['username']) + ' 在游戏中登录了。')
                 else:
                     if response_json['error_type'] == '035':
-                        send_group_msg(data['group_id'], '❌ 注册失败。\n' + '一个 QQ 号只能注册一个帐号，' + '\n' +
-                                       str(response_json['user_id']) + ' 不能再注册账号了。')
+                        send_group_msg(data['group_id'], f'❌ 注册失败。\n一个 QQ 号只能注册一个帐号，\n'
+                                                         f'{str(response_json["username"])} 不能再注册账号了。')
                     elif response_json['error_type'] == '036':
-                        send_group_msg(data['group_id'], '❌ 注册失败。\n' + response_json['username'] +
-                                       ' 用户名已经存在，请回到注册网页换一个用户名。')
+                        send_group_msg(data['group_id'], f'❌ 注册失败。\n'
+                                                         f'{response_json["username"]}'
+                                                         f' 用户名已经存在，请回到注册网页换一个用户名。')
                     else:
                         send_group_msg(data['group_id'],
-                                       '❌ 注册失败，发生未知错误。\n' + response_json['error_type'] + '\n' +
-                                       response_json['message'])
+                                       f'❌ 注册失败，发生未处理的错误。\n'
+                                       f'{response_json["error_type"]}\n'
+                                       f'{response_json["message"]}')
             elif operation == 'c':  # change password
                 response_json = requests.post(url=ENGINE_TRIBE_HOST + '/user/update_password',
                                               json={'username': username, 'password_hash': password_hash,
                                                     'api_key': ENGINE_TRIBE_API_KEY}).json()
                 if 'success' in response_json:
-                    send_group_msg(data['group_id'],
-                                   '🎉 ' + str(response_json['username']) + ' 的密码修改成功。')
+                    send_group_msg(data['group_id'], f'🎉 {str(response_json["username"])} 的密码修改成功。')
                 else:
                     send_group_msg(data['group_id'], '❌ 修改密码失败，用户不存在。')
         except Exception as e:
-            send_group_msg(data['group_id'], '❌ 无效的注册码，请检查是否复制完全。\n错误信息: ' + str(e))
+            send_group_msg(data['group_id'], '❌ 无效的注册码，请检查是否复制完全。\n'
+                                             '错误信息: ' + str(e))
             return
 
 
