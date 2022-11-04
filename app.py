@@ -48,7 +48,10 @@ async def bot():
         try:
             await commands[data['message'].strip().split(' ')[0]](data)
         except:
-            send_group_msg(data['group_id'], '❌ 命令用法不正确。')
+            if data['message'].startswith('e!register'):
+                send_group_msg(data['group_id'], '❌ 命令用法不正确。你空格捏？')
+            else:
+                send_group_msg(data['group_id'], '❌ 命令用法不正确。')
     return 'Success'
 
 
