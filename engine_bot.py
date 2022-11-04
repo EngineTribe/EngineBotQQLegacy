@@ -35,7 +35,7 @@ async def command_register(data):
         return
     else:
         try:
-            raw_register_code = data['message'].split(' ')[1].strip()
+            raw_register_code = data['message'].replace('e!register').split(' ')[0].strip()
             try:
                 register_code = base64.b64decode(raw_register_code.encode()).decode() \
                     .replace('\r\n', '\n').replace('\r', '\n').split('\n')
