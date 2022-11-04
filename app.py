@@ -78,7 +78,7 @@ async def webhook_payload():
     elif 'workflow_run' in webhook:
         if webhook["action"] == 'completed':
             message = f'📤 {webhook["repository"]["name"]} 代码库中的网页部署完成:\n' \
-                      f'webhook["workflow_run"]["head_commit"]["message"]'
+                      f'{webhook["workflow_run"]["head_commit"]["message"]}'
             for group in ENABLED_GROUPS:
                 await send_group_msg(group_id=group, message=message)
             return 'Success'
