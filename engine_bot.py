@@ -91,7 +91,7 @@ async def command_ban(data):
     if not data['sender']['user_id'] in GAME_ADMIN:
         await send_group_msg(data['group_id'], '❌ 无权使用该命令。')
         return
-    if data['message'].strip() == 'e!ban':
+    if data['parameters']:
         await send_group_msg(data['group_id'], '使用方法: e!ban 用户名')
         return
     else:
@@ -99,7 +99,7 @@ async def command_ban(data):
             username = data['parameters'].split(' ')[0]
             async with aiohttp.request(method='POST',
                                        url=ENGINE_TRIBE_HOST + '/user/update_permission',
-                                       json={'user_id': data['user_id'], 'permission': 'banned',
+                                       json={'username': username, 'permission': 'banned',
                                              'value': True, 'api_key': ENGINE_TRIBE_API_KEY}) as response:
                 response_json = await response.json()
             if 'success' in response_json:
@@ -116,7 +116,7 @@ async def command_unban(data):
     if not data['sender']['user_id'] in GAME_ADMIN:
         await send_group_msg(data['group_id'], '❌ 无权使用该命令。')
         return
-    if data['message'].strip() == 'e!unban':
+    if not data['parameters']:
         await send_group_msg(data['group_id'], '使用方法: e!unban 用户名')
         return
     else:
@@ -124,7 +124,7 @@ async def command_unban(data):
             username = data['parameters'].split(' ')[0]
             async with aiohttp.request(method='POST',
                                        url=ENGINE_TRIBE_HOST + '/user/update_permission',
-                                       json={'user_id': data['user_id'], 'permission': 'banned',
+                                       json={'username': username, 'permission': 'banned',
                                              'value': False, 'api_key': ENGINE_TRIBE_API_KEY}) as response:
                 response_json = await response.json()
             if 'success' in response_json:
