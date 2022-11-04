@@ -1,8 +1,9 @@
 # This file contains almost everything of Engine-bot except the web server and QQ-specific content
 import base64
-import binascii
+from binascii import Error as BinAsciiError
 
 from qq_adapter import *
+import aiohttp
 
 styles = ['超马1', '超马3', '超马世界', '新超马U']
 
@@ -37,10 +38,10 @@ async def command_register(data):
             raw_register_code = data['parameters'].split(' ')[0]
             try:  # auto add equal sign
                 register_code = base64.b64decode(raw_register_code.encode()).decode().split("\n")
-            except binascii.Error:
+            except BinAsciiError:
                 try:
                     register_code = base64.b64decode((raw_register_code + '=').encode()).decode().split("\n")
-                except binascii.Error:
+                except BinAsciiError:
                     register_code = base64.b64decode((raw_register_code + '==').encode()).decode().split("\n")
             operation = register_code[0]
             username = register_code[1]
