@@ -36,15 +36,12 @@ async def command_register(data):
         try:
             raw_register_code = data['parameters'].split(' ')[0]
             try:  # auto add equal sign
-                register_code = base64.b64decode(raw_register_code.encode()).decode() \
-                    .replace('\r\n', '\n').replace('\r', '\n').split('\n')
+                register_code = base64.b64decode(raw_register_code.encode()).decode().split("\n")
             except binascii.Error:
                 try:
-                    register_code = base64.b64decode((raw_register_code + '=').encode()).decode() \
-                        .replace('\r\n', '\n').replace('\r', '\n').split('\n')
+                    register_code = base64.b64decode((raw_register_code + '=').encode()).decode().split("\n")
                 except binascii.Error:
-                    register_code = base64.b64decode((raw_register_code + '==').encode()).decode() \
-                        .replace('\r\n', '\n').replace('\r', '\n').split('\n')
+                    register_code = base64.b64decode((raw_register_code + '==').encode()).decode().split("\n")
             operation = register_code[0]
             username = register_code[1]
             password_hash = register_code[2]
