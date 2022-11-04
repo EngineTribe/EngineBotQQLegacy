@@ -56,6 +56,7 @@ async def bot():
                 command_function = commands[command]
                 break
         try:
+            data['message'] = data['message'].strip()
             data['parameters'] = data['message'].replace(_command, '').strip()
             await command_function(data)
         except UnboundLocalError:
