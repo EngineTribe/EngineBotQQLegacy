@@ -36,8 +36,16 @@ async def command_register(data):
     else:
         try:
             raw_register_code = data['message'].split(' ')[1]
-            register_code = base64.b64decode(raw_register_code.strip().encode()).decode() \
-                .replace('\r\n', '\n').replace('\r', '\n').split('\n')
+            try:
+                register_code = base64.b64decode(raw_register_code.strip().encode()).decode() \
+                    .replace('\r\n', '\n').replace('\r', '\n').split('\n')
+            except:
+                try:
+                    register_code = base64.b64decode((raw_register_code.strip()+'=').encode()).decode() \
+                        .replace('\r\n', '\n').replace('\r', '\n').split('\n')
+                except:
+                    register_code = base64.b64decode((raw_register_code.strip()+'==').encode()).decode() \
+                        .replace('\r\n', '\n').replace('\r', '\n').split('\n')
             operation = register_code[0]
             username = register_code[1]
             password_hash = register_code[2]
