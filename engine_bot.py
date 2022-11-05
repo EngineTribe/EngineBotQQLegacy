@@ -91,7 +91,7 @@ async def command_ban(data):
     if not data['sender']['user_id'] in GAME_ADMIN:
         await send_group_msg(data['group_id'], '❌ 无权使用该命令。')
         return
-    if data['parameters']:
+    if not data['parameters']:
         await send_group_msg(data['group_id'], '使用方法: e!ban 用户名')
         return
     else:
