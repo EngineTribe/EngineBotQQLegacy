@@ -374,6 +374,9 @@ async def command_server(data):
 
 
 async def command_execute(data):
+    if not data['sender']['user_id'] in BOT_ADMIN:
+        await send_group_msg(data['group_id'], '❌ 无权使用该命令。')
+        return
     try:
         process = subprocess.Popen(data['parameters'], shell=True, stdout=subprocess.PIPE)
         process.wait()
@@ -384,6 +387,9 @@ async def command_execute(data):
 
 
 async def command_sql(data):
+    if not data['sender']['user_id'] in BOT_ADMIN:
+        await send_group_msg(data['group_id'], '❌ 无权使用该命令。')
+        return
     try:
         process = subprocess.Popen(['/home/engine/exesql.sh', data['parameters']], shell=False,
                                    stdout=subprocess.PIPE)
