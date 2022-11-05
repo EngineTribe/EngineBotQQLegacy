@@ -19,12 +19,12 @@ async def command_help(data):
              'e!random : 来个随机关卡。\n' \
              'e!server : 查看服务器状态。'
     if data['sender']['user_id'] in BOT_ADMIN:
-        retval += '📑 可用的管理命令:\n' \
+        retval += '\n📑 可用的管理命令:\n' \
                   'e!permission : 更新用户权限。\n' \
                   'e!execute : 运行命令。\n' \
                   'e!sql : 执行 SQL 语句。'
     if data['sender']['user_id'] in GAME_ADMIN:
-        retval += '📑 可用的游戏管理命令:\n' \
+        retval += '\n📑 可用的游戏管理命令:\n' \
                   'e!ban : 封禁用户。\n' \
                   'e!unban : 解封用户。'
     await send_group_msg(group_id=data['group_id'], message=retval)
