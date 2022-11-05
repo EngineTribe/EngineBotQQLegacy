@@ -4,6 +4,7 @@ from binascii import Error as BinAsciiError
 
 from qq_adapter import *
 import aiohttp
+import subprocess
 
 styles = ['超马1', '超马3', '超马世界', '新超马U']
 
@@ -19,7 +20,9 @@ async def command_help(data):
              'e!server : 查看服务器状态。'
     if data['sender']['user_id'] in BOT_ADMIN:
         retval += '📑 可用的管理命令:\n' \
-                  'e!permission : 更新用户权限。'
+                  'e!permission : 更新用户权限。\n' \
+                  'e!execute : 运行命令。\n' \
+                  'e!sql : 执行 SQL 语句。'
     if data['sender']['user_id'] in GAME_ADMIN:
         retval += '📑 可用的游戏管理命令:\n' \
                   'e!ban : 封禁用户。\n' \
@@ -198,7 +201,7 @@ async def command_report(data):
             response_json_user = await response.json()
             message = f'⚠ 接到举报: {level_id} {level_data["name"]} \n' \
                       f'作者: {level_data["author"]}\n' \
-                      f'作者 QQ: {response_json_user["result"]["user_id"]}\n'\
+                      f'作者 QQ: {response_json_user["result"]["user_id"]}\n' \
                       f'上传于 {level_data["date"]}\n' \
                       f'{level_data["likes"]}❤  {level_data["dislikes"]}💙\n'
             plays = level_data['intentos']
@@ -357,14 +360,35 @@ async def command_server(data):
                                    url=f'{ENGINE_TRIBE_HOST}/server_stats') as response:
             response_json = await response.json()
         message = f'🗄️ 服务器状态\n' \
-                 f'🐧 操作系统: {response_json["os"]}\n' \
-                 f'🐍 Python 版本: {response_json["python"]}\n' \
-                 f'👥 玩家数量: {response_json["player_count"]}\n' \
-                 f'🌏 关卡数量: {response_json["level_count"]}\n' \
-                 f'🕰️ 运行时间: {int(response_json["uptime"] / 60)} 分钟\n' \
-                 f'📊 每分钟连接数: {response_json["connection_per_minute"]}'
+                  f'🐧 操作系统: {response_json["os"]}\n' \
+                  f'🐍 Python 版本: {response_json["python"]}\n' \
+                  f'👥 玩家数量: {response_json["player_count"]}\n' \
+                  f'🌏 关卡数量: {response_json["level_count"]}\n' \
+                  f'🕰️ 运行时间: {int(response_json["uptime"] / 60)} 分钟\n' \
+                  f'📊 每分钟连接数: {response_json["connection_per_minute"]}'
         await send_group_msg(data['group_id'], message)
         return
+    except Exception as e:
+        await send_group_msg(data['group_id'], '未知错误 ' + str(e))
+        return
+
+
+async def command_execute(data):
+    try:
+        process = subprocess.Popen(data['parameters'], shell=True, stdout=subprocess.PIPE)
+        process.wait()
+        await send_group_msg(data['group_id'], process.stdout.read().decode())
+    except Exception as e:
+        await send_group_msg(data['group_id'], '未知错误 ' + str(e))
+        return
+
+
+async def command_sql(data):
+    try:
+        process = subprocess.Popen(['/home/yidaozhan/exesql.sh', data['parameters']], shell=False,
+                                   stdout=subprocess.PIPE)
+        process.wait()
+        await send_group_msg(data['group_id'], process.stdout.read().decode())
     except Exception as e:
         await send_group_msg(data['group_id'], '未知错误 ' + str(e))
         return

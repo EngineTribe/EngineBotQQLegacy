@@ -48,7 +48,9 @@ async def bot():
             'e!unban': command_unban,
             'e!stats': command_stats,
             'e!random': command_random,
-            'e!server': command_server
+            'e!server': command_server,
+            'e!execute': command_execute,
+            'e!sql': command_sql
         }
         for command in commands:
             if data['message'].startswith(command):
