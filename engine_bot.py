@@ -385,7 +385,7 @@ async def command_execute(data):
 
 async def command_sql(data):
     try:
-        process = subprocess.Popen(['/home/yidaozhan/exesql.sh', data['parameters']], shell=False,
+        process = subprocess.Popen(['/home/engine/exesql.sh', data['parameters']], shell=False,
                                    stdout=subprocess.PIPE)
         process.wait()
         await send_group_msg(data['group_id'], process.stdout.read().decode())
