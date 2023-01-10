@@ -159,7 +159,7 @@ async def command_permission(data):
                 value = False
             async with aiohttp.request(method='POST',
                                        url=ENGINE_TRIBE_HOST + '/user/update_permission',
-                                       json={'user_id': data['user_id'], 'permission': permission,
+                                       json={'username': username, 'permission': permission,
                                              'value': value, 'api_key': ENGINE_TRIBE_API_KEY}) as response:
                 response_json = await response.json()
             if 'success' in response_json:
