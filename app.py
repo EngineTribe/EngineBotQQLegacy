@@ -27,7 +27,8 @@ async def bot():
                                      f'{response_json["username"]} ({data["user_id"]}) 已经退群，'
                                      f'所以帐号暂时冻结。下次入群时将恢复可玩。')
             else:
-                await send_group_msg(data['group_id'], f'❌ 冻结帐号失败，{data["user_id"]} 并没有注册引擎部落账号。')
+                await send_group_msg(data['group_id'],
+                                     f'{data["user_id"]} 已退群，但并没有注册引擎部落账号。所以不进行操作。')
         if data['notice_type'] == 'group_increase':
             async with aiohttp.request(method='POST',
                                        url=ENGINE_TRIBE_HOST + '/user/update_permission',
@@ -84,8 +85,6 @@ async def webhook_payload():
             for group in ENABLED_GROUPS:
                 await send_group_msg(group_id=group, message=message)
             return 'Success'
-        else:
-            return 'NotImplemented'
     elif 'release' in webhook:
         if webhook["action"] == 'published':
             message = f'⏩ [CQ:at,qq=all] 引擎部落服务器发布了新的大版本: {webhook["release"]["tag_name"]} !\n' \
@@ -94,41 +93,51 @@ async def webhook_payload():
             for group in ENABLED_GROUPS:
                 await send_group_msg(group_id=group, message=message)
             return 'Success'
-        else:
-            return 'NotImplemented'
+    for group in ENABLED_GROUPS:
+        await send_group_msg(group_id=group, message='❌ 接收到了新的 GitHub 推送消息，但并未实现对应的推送条目。')
+    return 'NotImplemented'
 
 
 @webhook_app.route('/enginetribe', methods=["POST"])
 async def webhook_enginetribe():
-    webhook = request.get_json()
-    message = ''
-    if webhook["type"] == 'new_arrival':  # new arrival
-        message = f'📤 {webhook["author"]} 上传了新关卡: {webhook["level_name"]}\n' \
-                  f'ID: {webhook["level_id"]}'
-    if webhook["type"] == 'new_featured':  # new featured
-        message = f'🌟 {webhook["author"]} 的关卡 {webhook["level_name"]} 被加入了管理推荐关卡，快来玩!\n' \
-                  f'ID: {webhook["level_id"]}'
-    if 'likes' in webhook["type"]:  # 10/100/1000 likes
-        message = f'🎉 恭喜，{webhook["author"]} 的关卡 {webhook["level_name"]} 获得了 ' \
-                  f'{webhook["type"].replace("_likes", "")} 个点赞!\n' \
-                  f'ID: {webhook["level_id"]}'
-    if 'plays' in webhook["type"]:  # 100/1000 plays
-        message = f'🎉 恭喜，{webhook["author"]} 的关卡 {webhook["level_name"]} 已经被游玩了 ' \
-                  f'{webhook["type"].replace("_plays", "")} 次!\n' \
-                  f'ID: {webhook["level_id"]}'
-    if 'deaths' in webhook["type"]:  # 100/1000 deaths
-        message = f'🔪 {webhook["author"]} 的关卡 {webhook["level_name"]} 已经夺得了 ' \
-                  f'{webhook["type"].replace("_deaths", "")} 个人头，快去挑战吧!\n' \
-                  f'ID: {webhook["level_id"]}'
-    if 'clears' in webhook["type"]:  # 100/1000 clears
-        message = f'🎉 恭喜，{webhook["author"]} 的关卡 {webhook["level_name"]} 已经被通关 ' \
-                  f'{webhook["type"].replace("_clears", "")} 次，快去挑战吧!\n' \
-                  f'ID: {webhook["level_id"]}'
-    if not message:
+    webhook: dict = request.get_json()
+    message: str = ''
+    match webhook["type"]:
+        case 'new_arrival':  # new arrival
+            message = f'📤 {webhook["author"]} 上传了新关卡: {webhook["level_name"]}\n' \
+                      f'ID: {webhook["level_id"]}'
+        case 'new_featured':  # new featured
+            message = f'🌟 {webhook["author"]} 的关卡 {webhook["level_name"]} 被加入了管理推荐关卡，快来玩!\n' \
+                      f'ID: {webhook["level_id"]}'
+        case 'permission_change':
+            permission_name = {'booster': '捐赠者', 'mod': '关卡管理员'}[webhook['permission']]
+            message = f"{'🤗' if webhook['value'] else '😥'} " \
+                      f"{webhook['username']} {'获得' if webhook['value'] else '失去'} 了" \
+                      f"引擎部落的{permission_name}权限！"
+        case _:
+            if 'likes' in webhook["type"]:  # 10/100/1000 likes
+                message = f'🎉 恭喜，{webhook["author"]} 的关卡 {webhook["level_name"]} 获得了 ' \
+                          f'{webhook["type"].replace("_likes", "")} 个点赞!\n' \
+                          f'ID: {webhook["level_id"]}'
+            if 'plays' in webhook["type"]:  # 100/1000 plays
+                message = f'🎉 恭喜，{webhook["author"]} 的关卡 {webhook["level_name"]} 已经被游玩了 ' \
+                          f'{webhook["type"].replace("_plays", "")} 次!\n' \
+                          f'ID: {webhook["level_id"]}'
+            if 'deaths' in webhook["type"]:  # 100/1000 deaths
+                message = f'🔪 {webhook["author"]} 的关卡 {webhook["level_name"]} 已经夺得了 ' \
+                          f'{webhook["type"].replace("_deaths", "")} 个人头，快去挑战吧!\n' \
+                          f'ID: {webhook["level_id"]}'
+            if 'clears' in webhook["type"]:  # 100/1000 clears
+                message = f'🎉 恭喜，{webhook["author"]} 的关卡 {webhook["level_name"]} 已经被通关 ' \
+                          f'{webhook["type"].replace("_clears", "")} 次，快去挑战吧!\n' \
+                          f'ID: {webhook["level_id"]}'
+    if message != '':
         for group in ENABLED_GROUPS:
             await send_group_msg(group_id=group, message=message)
         return 'Success'
     else:
+        for group in ENABLED_GROUPS:
+            await send_group_msg(group_id=group, message='❌ 接收到了新的引擎部落推送消息，但并未实现对应的推送条目。')
         return 'NotImplemented'
 
 
