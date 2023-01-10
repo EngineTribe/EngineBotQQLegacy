@@ -112,7 +112,7 @@ async def webhook_enginetribe():
         case 'permission_change':
             permission_name = {'booster': '捐赠者', 'mod': '关卡管理员'}[webhook['permission']]
             message = f"{'🤗' if webhook['value'] else '😥'} " \
-                      f"{webhook['username']} {'获得' if webhook['value'] else '失去'} 了" \
+                      f"{webhook['username']} {'获得' if webhook['value'] else '失去'}了" \
                       f"引擎部落的{permission_name}权限！"
         case _:
             if 'likes' in webhook["type"]:  # 10/100/1000 likes
