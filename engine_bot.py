@@ -210,7 +210,7 @@ async def command_report(data):
             if int(deaths) == 0:
                 message += f'{str(clears)}次通关 / {str(plays)}次游玩\n'
             else:
-                message += f'{str(clears)}次通关 / {str(plays)}次游玩 {round((int(clears) / int(deaths)) * 100, 2)} %\n'
+                message += f'{str(clears)}次通关 / {str(plays)}次游玩 {round((int(clears) / int(plays)) * 100, 2)} %\n'
             message += f'标签: {level_data["etiquetas"]}, 游戏风格: {styles[int(level_data["apariencia"])]}'
             await send_group_msg(group_id=ADMIN_GROUP, message=message)
             return
@@ -257,7 +257,7 @@ async def command_query(data):
                 if int(deaths) == 0:
                     message += f'{str(clears)}次通关 / {str(plays)}次游玩\n'
                 else:
-                    message += f'{str(clears)}次通关 / {str(plays)}次游玩 {round((int(clears) / int(deaths)) * 100, 2)} %\n'
+                    message += f'{str(clears)}次通关 / {str(plays)}次游玩 {round((int(clears) / int(plays)) * 100, 2)} %\n'
                 message += f'标签: {level_data["etiquetas"]}, 游戏风格: {styles[int(level_data["apariencia"])]}'
                 await send_group_msg(group_id=data['group_id'], message=message)
                 return
@@ -289,7 +289,7 @@ async def command_random(data):
         if int(deaths) == 0:
             message += f'{str(clears)}次通关 / {str(plays)}次游玩\n'
         else:
-            message += f'{str(clears)}次通关 / {str(plays)}次游玩 {round((int(clears) / int(deaths)) * 100, 2)} %\n'
+            message += f'{str(clears)}次通关 / {str(plays)}次游玩 {round((int(clears) / int(plays)) * 100, 2)} %\n'
         message += f'标签: {level_data["etiquetas"]}, 游戏风格: {styles[int(level_data["apariencia"])]}'
         await send_group_msg(group_id=data['group_id'], message=message)
         return
