@@ -1,11 +1,15 @@
 {
   ".or": [
     {
-      "message": {
-        ".regex": "^e!",
-        "anonymous": {
-          ".eq": null
-        }
+      "message_type": "group",
+      "group_id": {
+        ".in": [
+          723483890
+        ]
+      },
+      ".regex": "e!",
+      "anonymous": {
+        ".eq": null
       }
     },
     {

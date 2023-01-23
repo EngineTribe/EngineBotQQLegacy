@@ -7,9 +7,18 @@ from time import sleep
 from engine_bot import *
 from qq_adapter import *
 import aiohttp
+import rapidjson as json
 
 bot_app = Flask(__name__)
 webhook_app = Flask(__name__)
+
+
+def get_cmdline(message: str) -> str | None:
+    for line in message.splitlines(keepends=False):
+        line = line.strip()
+        if line.startswith("e!"):
+            return line
+    return None
 
 
 @bot_app.route('/', methods=['POST'])
@@ -50,21 +59,24 @@ async def bot():
             'e!stats': command_stats,
             'e!random': command_random,
             'e!server': command_server,
-            'e!execute': command_execute,
-            'e!sql': command_sql
+            'e!execute': command_execute
         }
+        command_function = None
+        _command: str = ''
+        cmdline: str = get_cmdline(data['message'])
         for command in commands:
-            if data['message'].startswith(command):
+            if cmdline.startswith(command):
                 _command = command
                 command_function = commands[command]
                 break
-        try:
+        if (command_function is not None) and (_command != ''):
             data['message'] = data['message'].strip()
-            data['parameters'] = data['message'].replace(_command, '').strip()
-            await command_function(data)
-        except UnboundLocalError:
-            await send_group_msg(data['group_id'], '❌ 命令用法不正确。')
-    return 'Success'
+            data['parameters'] = cmdline.replace(_command, '').strip()
+            return await command_function(data)
+        else:
+            if cmdline is not None:
+                await send_group_msg(data['group_id'], f'❌ 未知命令: {cmdline}')
+            return 'Unknown command'
 
 
 # GitHub webhook
@@ -94,7 +106,11 @@ async def webhook_payload():
                 await send_group_msg(group_id=group, message=message)
             return 'Success'
     for group in ENABLED_GROUPS:
-        await send_group_msg(group_id=group, message='❌ 接收到了新的 GitHub 推送消息，但并未实现对应的推送条目。')
+        await send_group_msg(
+            group_id=group,
+            message=f'❌ 接收到了新的 GitHub 推送消息，但并未实现对应的推送条目。\n'
+                    f'{json.dumps(webhook, ensure_ascii=False)}'
+        )
     return 'NotImplemented'
 
 
@@ -137,7 +153,11 @@ async def webhook_enginetribe():
         return 'Success'
     else:
         for group in ENABLED_GROUPS:
-            await send_group_msg(group_id=group, message='❌ 接收到了新的引擎部落推送消息，但并未实现对应的推送条目。')
+            await send_group_msg(
+                group_id=group,
+                message=f'❌ 接收到了新的引擎部落推送消息，但并未实现对应的推送条目。\n'
+                        f'{json.dumps(webhook, ensure_ascii=False)}'
+            )
         return 'NotImplemented'
 
 
