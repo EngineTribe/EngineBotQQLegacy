@@ -430,7 +430,7 @@ async def command_random(data) -> str:
 async def command_stats(data) -> str:
     if not data['parameters']:
         request_body = {'user_id': data['sender']['user_id']}
-    elif data['parameters'] == str(int(data['parameters'])):
+    elif data['parameters'].isnumeric():
         request_body = {'user_id': str(data['parameters'])}
     else:
         request_body = {'username': data['parameters'].split(' ')[0]}

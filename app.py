@@ -63,7 +63,10 @@ async def bot():
         }
         command_function = None
         _command: str = ''
-        cmdline: str = get_cmdline(data['message'])
+        cmdline = get_cmdline(data['message'])
+        if cmdline is None:
+            # 匹配 cmdline 失败
+            return 'Unknown command'
         for command in commands:
             if cmdline.startswith(command):
                 _command = command
