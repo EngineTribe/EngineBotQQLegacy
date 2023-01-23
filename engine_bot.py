@@ -39,7 +39,7 @@ def reply(message: str, at_sender: bool = False, delete: bool = False, ):
         'reply': message,
         'at_sender': at_sender,
         'delete': delete,
-        'auto_escape': True if ('[CQ:' in message) else False
+        'auto_escape': False if ('[CQ:' in message) else True
     })
 
 
