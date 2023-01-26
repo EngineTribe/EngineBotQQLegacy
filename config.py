@@ -10,4 +10,4 @@ ENABLED_GROUPS = [723483890]
 BOT_ADMIN = [3526514925]
 BOT_USER_ID = 3010722125
 ADMIN_GROUP = 10001  # Engine Tribe moderators group
-BOT_AUTH_CODE = 'EngineBot|PC|CN'  # fake SMM_WE client token
+BOT_AUTH_CODE = '0|PC|CN'  # fake SMM_WE client token

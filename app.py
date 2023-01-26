@@ -75,7 +75,8 @@ async def bot():
         if (command_function is not None) and (_command != ''):
             data['message'] = data['message'].strip()
             data['parameters'] = cmdline.replace(_command, '').strip()
-            return await command_function(data)
+            retval = await command_function(data)
+            return retval if retval is not None else 'Success'
         else:
             if cmdline is not None:
                 await send_group_msg(data['group_id'], f'❌ 未知命令: {cmdline}')
